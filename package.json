@@ -1,0 +1,16 @@
+{
+  "name": "task-manager-app",
+  "version": "1.0.0",
+  "description": "A web-based task management application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["task", "manager", "productivity"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+
