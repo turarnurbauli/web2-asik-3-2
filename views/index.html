@@ -31,6 +31,7 @@
             </p>
         </section>
 
+        <!-- TEAM INFO (оставляем как есть) -->
         <section id="about" class="team-section">
             <h2>Team Members</h2>
             <div class="team-list">
@@ -43,35 +44,77 @@
             </div>
         </section>
 
-        <section id="features" class="features-section">
-            <h2>Planned Features</h2>
-            <ul class="features-list">
-                <li>Create, edit, and delete tasks</li>
-                <li>Mark tasks as complete/incomplete</li>
-                <li>Set due dates and priorities for tasks</li>
-                <li>Organize tasks into categories or projects</li>
-                <li>Search and filter tasks</li>
-                <li>Task reminders and notifications</li>
-                <li>User authentication and personal task lists</li>
-                <li>Data persistence with database integration</li>
-            </ul>
-        </section>
+        <!-- ОСНОВНОЙ CRUD ИНТЕРФЕЙС -->
+        <section id="tasks" class="tasks-section">
+            <h2>Your Tasks</h2>
+            <p class="tasks-intro">
+                Here you can create, edit, and delete tasks. All data is stored in MongoDB Atlas and
+                loaded dynamically through the backend API.
+            </p>
 
-        <section class="roadmap-section">
-            <h2>Development Roadmap</h2>
-            <ul class="roadmap-list">
-                <li><strong>Week 1:</strong> Project setup and landing page (Current)</li>
-                <li><strong>Week 2:</strong> Task form and POST route implementation</li>
-                <li><strong>Week 3:</strong> Database integration (MongoDB/PostgreSQL)</li>
-                <li><strong>Week 4:</strong> Task CRUD operations and user interface</li>
-                <li><strong>Week 5:</strong> Additional features and polish</li>
-            </ul>
+            <div class="tasks-layout">
+                <!-- CREATE / UPDATE FORM -->
+                <div class="task-form-card">
+                    <h3 id="form-title">Create New Task</h3>
+                    <form id="taskForm">
+                        <input type="hidden" id="taskId">
+                        <div class="form-group">
+                            <label for="title">Title <span class="required">*</span></label>
+                            <input type="text" id="title" required placeholder="Task title">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" rows="3" placeholder="Short description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status">
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                        <div class="task-form-actions">
+                            <button type="submit" class="btn-primary" id="saveTaskBtn">Save Task</button>
+                            <button type="button" class="btn-secondary" id="cancelEditBtn" style="display:none;">
+                                Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TASKS TABLE -->
+                <div class="task-table-card">
+                    <h3>Task List</h3>
+                    <div class="table-wrapper">
+                        <table class="task-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasksBody">
+                                <!-- rows will be rendered by app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="tasksEmptyMessage" class="tasks-empty-message" style="display:none;">
+                        No tasks yet. Use the form on the left to create your first task.
+                    </p>
+                </div>
+            </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2024 TaskManager. Built with Node.js and Express.js</p>
+        <p>&copy; 2024 TaskManager. Built with Node.js, Express.js, and MongoDB Atlas</p>
     </footer>
+
+    <script src="/app.js"></script>
 </body>
 </html>
 

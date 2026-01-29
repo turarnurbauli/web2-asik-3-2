@@ -1,48 +1,130 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
+
 const app = express();
 
-// Middleware для раздачи статических файлов из папки public
+// ====== ENV & DB CONFIG ======
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.warn('Warning: MONGO_URI is not set. MongoDB connection will fail in production.');
+}
+
+mongoose
+  .connect(MONGO_URI, { })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
+
+// ====== MIDDLEWARE ======
 app.use(express.static('public'));
-
-// Middleware для обработки данных форм (POST запросы)
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// ============================================
-// CUSTOM LOGGER MIDDLEWARE
-// ============================================
-// Логирует HTTP метод и URL каждого запроса
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
-  next(); // Передает управление следующему middleware/маршруту
+  next();
 });
 
-// ============================================
-// МАРШРУТЫ (ROUTES)
-// ============================================
+// ====== TASK MODEL (CRUD DOMAIN) ======
+const taskSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    description: { type: String, trim: true },
+    status: {
+      type: String,
+      enum: ['pending', 'in-progress', 'done'],
+      default: 'pending'
+    }
+  },
+  { timestamps: true }
+);
 
-// Главная страница (Home)
-app.get('/', (req, res) => { 
+const Task = mongoose.model('Task', taskSchema);
+
+// ====== API ROUTES (CRUD) ======
+// Get all tasks
+app.get('/api/tasks', async (req, res) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+    res.json(tasks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+});
+
+// Create task
+app.post('/api/tasks', async (req, res) => {
+  try {
+    const { title, description, status } = req.body;
+    const task = await Task.create({ title, description, status });
+    res.status(201).json(task);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Update task
+app.put('/api/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, status } = req.body;
+    const task = await Task.findByIdAndUpdate(
+      id,
+      { title, description, status },
+      { new: true, runValidators: true }
+    );
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    res.json(task);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Delete task
+app.delete('/api/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findByIdAndDelete(id);
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    res.status(204).end();
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// ====== PAGES ======
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-// Страница "О проекте" (About)
+
 app.get('/about', (req, res) => {
   res.sendFile(__dirname + '/views/about.html');
 });
 
-// Страница "Контакты" - GET (показать форму)
+
 app.get('/contact', (req, res) => {
   res.sendFile(__dirname + '/views/contact.html');
 });
 
-// Страница "Контакты" - POST (обработать форму)
+
 app.post('/contact', (req, res) => {
-  // Получаем данные из формы
+  
   const { name, email, message } = req.body;
   
-  // ВАЛИДАЦИЯ: Проверяем наличие обязательных полей
+  
   if (!name || !email || !message) {
     return res.status(400).send(`
       <!DOCTYPE html>
@@ -78,10 +160,10 @@ app.post('/contact', (req, res) => {
     `);
   }
   
-  // Выводим данные формы в консоль для отладки
+  
   console.log('Form data received:', req.body);
   
-  // Создаем объект с данными сообщения
+  
   const contactData = {
     name: name,
     email: email,
@@ -89,10 +171,10 @@ app.post('/contact', (req, res) => {
     timestamp: new Date().toISOString()
   };
   
-  // Сохранение данных в JSON файл
+  
   const dataFilePath = path.join(__dirname, 'messages.json');
   
-  // Читаем существующие сообщения (если файл существует)
+  
   let messages = [];
   if (fs.existsSync(dataFilePath)) {
     try {
@@ -103,10 +185,10 @@ app.post('/contact', (req, res) => {
     }
   }
   
-  // Добавляем новое сообщение
+  
   messages.push(contactData);
   
-  // Сохраняем обновленные сообщения в файл
+  
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(messages, null, 2), 'utf8');
     console.log('Message saved to messages.json');
@@ -114,7 +196,7 @@ app.post('/contact', (req, res) => {
     console.error('Error saving message:', error);
   }
   
-  // Отправляем ответ пользователю
+  
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -150,15 +232,13 @@ app.post('/contact', (req, res) => {
   `);
 });
 
-// ============================================
-// НОВЫЕ МАРШРУТЫ ДЛЯ ASSIGNMENT 2 PART 1
-// ============================================
 
-// Маршрут /search с query параметром q
+
+
 app.get('/search', (req, res) => {
-  const query = req.query.q; // Получаем query параметр q
+  const query = req.query.q; 
   
-  // ВАЛИДАЦИЯ: Если параметр q отсутствует, возвращаем 400
+  
   if (!query || query.trim() === '') {
     return res.status(400).send(`
       <!DOCTYPE html>
@@ -195,15 +275,15 @@ app.get('/search', (req, res) => {
     `);
   }
   
-  // Если параметр есть, отправляем страницу с результатами поиска
+  
   res.sendFile(__dirname + '/views/search.html');
 });
 
-// Маршрут /item/:id с route параметром id
+
 app.get('/item/:id', (req, res) => {
-  const itemId = req.params.id; // Получаем route параметр id
+  const itemId = req.params.id; 
   
-  // ВАЛИДАЦИЯ: Если параметр id отсутствует, возвращаем 400
+  
   if (!itemId || itemId.trim() === '') {
     return res.status(400).send(`
       <!DOCTYPE html>
@@ -240,13 +320,13 @@ app.get('/item/:id', (req, res) => {
     `);
   }
   
-  // Если параметр есть, отправляем страницу с информацией об элементе
+  
   res.sendFile(__dirname + '/views/item.html');
 });
 
-// API endpoint /api/info - возвращает JSON
+
 app.get('/api/info', (req, res) => {
-  // Возвращаем информацию о проекте в формате JSON
+  
   res.json({
     project: {
       name: 'TaskManager',
@@ -285,11 +365,10 @@ app.get('/api/info', (req, res) => {
   });
 });
 
-// 404 страница (для всех неизвестных маршрутов)
+
 app.use((req, res) => {
   res.status(404).sendFile(__dirname + '/views/404.html');
 });
 
-// Запуск сервера на порту 3000
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
 
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

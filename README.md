@@ -2,7 +2,8 @@
 
 ## Project Description
 
-TaskManager is a simple and intuitive web application designed to help users organize, track, and manage their daily tasks efficiently. This application provides a clean and user-friendly interface for creating, editing, and managing tasks with features such as due dates, priorities, and task categorization. Built with Node.js and Express.js, TaskManager aims to help users stay productive and never miss an important deadline.
+TaskManager is a simple and intuitive full-stack web application designed to help users organize, track, and manage their daily tasks efficiently.  
+The application now includes a production-ready web interface connected to a Node.js + Express backend and a MongoDB Atlas database.
 
 ## Team Members
 
@@ -23,46 +24,51 @@ Task management is a fundamental productivity tool that helps individuals and te
 
 The application will evolve from a simple static landing page to a full-featured task management system with database integration, user authentication, and advanced features.
 
-## Installation Instructions
+## Local Setup and Run Instructions
 
-1. Ensure you have Node.js installed on your system (version 14 or higher recommended).
+1. Ensure you have **Node.js** installed (version 16 or higher recommended).
 
-2. Clone or download this project to your local machine.
+2. Clone this project to your local machine:
+   ```bash
+   git clone https://github.com/turarnurbauli/web2-asik-3-2.git
+   cd web2-asik-3-2
+   ```
 
-3. Open a terminal/command prompt in the project directory.
-
-4. Install dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
 
+4. Create a `.env` file in the project root with:
+   ```env
+   PORT=3000
+   MONGO_URI=your-mongodb-atlas-connection-string
+   ```
+   - `MONGO_URI` should be a **MongoDB Atlas** connection string (do not commit `.env` to GitHub).
+
 5. Start the server:
    ```bash
-   node server.js
+   npm start
    ```
 
-6. Open your web browser and navigate to:
+6. Open your browser and navigate to:
    ```
    http://localhost:3000
    ```
 
-7. Test the routes:
-   - Home: http://localhost:3000/
-   - About: http://localhost:3000/about
-   - Contact: http://localhost:3000/contact
-   - Search: http://localhost:3000/search?q=task
-   - Item: http://localhost:3000/item/123
-   - API Info: http://localhost:3000/api/info
-   - Test 404: http://localhost:3000/unknown-page
-   
-   **Note:** Check the server console to see the logger middleware in action - it logs every request!
+7. From the home page (`/`) you can:
+   - Create a new task using the form
+   - Edit an existing task
+   - Delete a task
+   - See data loaded dynamically from the backend API and stored in MongoDB Atlas
 
 ## Project Structure
 
 ```
 project-root/
 ├── public/
-│   └── style.css          # CSS styling for the application
+│   ├── style.css          # CSS styling for the application and tasks UI
+│   └── app.js             # Frontend logic (CRUD via fetch to /api/tasks)
 ├── views/
 │   ├── index.html         # Landing page (Home)
 │   ├── about.html         # About page
@@ -70,7 +76,7 @@ project-root/
 │   ├── search.html        # Search results page
 │   ├── item.html          # Item details page
 │   └── 404.html           # 404 error page
-├── server.js              # Main Express server file
+├── server.js              # Main Express server file (API + pages + MongoDB connection)
 ├── package.json           # Node.js dependencies and project metadata
 ├── messages.json          # JSON file storing contact form submissions (auto-created)
 └── README.md              # Project documentation
@@ -123,13 +129,13 @@ project-root/
 ## Routes
 
 ### Basic Routes
-- **GET /** - Home page (landing page with project overview)
+- **GET /** - Home page with TaskManager CRUD UI (table + form)
 - **GET /about** - About page (team information and project details)
 - **GET /contact** - Contact page (displays contact form)
 - **POST /contact** - Handles form submissions from the contact page
 - **404** - Error page for unknown routes
 
-### Assignment 2 Part 1 Routes
+### Assignment 2 / 3 Part 1 Routes
 - **GET /search?q=...** - Search page with query parameter
   - Query parameter: `q` (required)
   - Example: `/search?q=task`
@@ -142,6 +148,12 @@ project-root/
   
 - **GET /api/info** - API endpoint returning project information in JSON format
   - Returns JSON object with project details, team info, routes, and technologies
+
+### Assignment 3 Part 2 API Routes (CRUD)
+- **GET /api/tasks** - Get all tasks (loaded into UI table)
+- **POST /api/tasks** - Create a new task (called from form)
+- **PUT /api/tasks/:id** - Update an existing task
+- **DELETE /api/tasks/:id** - Delete a task
 
 ## Form Features
 
@@ -157,10 +169,11 @@ The contact form includes:
 
 - **Node.js** - JavaScript runtime environment
 - **Express.js** - Web application framework
+- **MongoDB Atlas** - Cloud database for storing tasks
+- **Mongoose** - ODM for working with MongoDB
 - **HTML5** - Markup language for structure
 - **CSS3** - Styling and layout
-- **JavaScript** - Client-side form validation
-- **File System (fs)** - For saving form data to JSON file
+- **JavaScript** - Client-side logic and API calls (`fetch`)
 
 ## Features
 
@@ -198,7 +211,6 @@ The contact form includes:
 - Task statistics and analytics
 - Export/import functionality
 - Email notifications for form submissions
-- Database integration for storing form data
 
 ## License
 

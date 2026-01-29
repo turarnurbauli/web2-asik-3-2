@@ -1,17 +1,22 @@
 {
-  "name": "task-manager-app",
+  "name": "taskmanager-web2-asik-1",
   "version": "1.0.0",
-  "description": "A web-based task management application",
+  "description": "TaskManager full-stack app for Assignment 3 (Node.js, Express, MongoDB Atlas, Render).",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["task", "manager", "productivity"],
+  "keywords": [
+    "node",
+    "express",
+    "mongodb",
+    "taskmanager"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.7.0"
   }
 }
-
-
