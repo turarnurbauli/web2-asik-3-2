@@ -581,6 +581,42 @@ footer p {
     margin-bottom: 1.5rem;
 }
 
+.auth-panel {
+    background-color: #f9fbfc;
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.auth-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.auth-form .form-group.inline {
+    flex: 1 1 220px;
+}
+
+.auth-status {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.auth-hint {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.auth-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+}
+
 .tasks-layout {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -633,6 +669,10 @@ footer p {
 
 .task-table tbody tr:hover {
     background-color: #f9fbfc;
+}
+
+.task-table td small {
+    color: #7f8c8d;
 }
 
 .tasks-empty-message {
@@ -692,9 +732,20 @@ footer p {
     color: #27ae60;
 }
 
+.form-hint {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
 @media (max-width: 900px) {
     .tasks-layout {
         grid-template-columns: 1fr;
+    }
+
+    .auth-form {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 

@@ -24,6 +24,12 @@ Task management is a fundamental productivity tool that helps individuals and te
 
 The application will evolve from a simple static landing page to a full-featured task management system with database integration, user authentication, and advanced features.
 
+## Deployed Application (Production)
+
+- **Public URL**: https://web2-asik-3-2.onrender.com
+- The root route `/` serves the TaskManager web interface with full CRUD functionality.
+- Auth is required for write operations (create/update/delete); default admin: **admin@example.com / admin123**.
+
 ## Local Setup and Run Instructions
 
 1. Ensure you have **Node.js** installed (version 16 or higher recommended).
@@ -43,8 +49,10 @@ The application will evolve from a simple static landing page to a full-featured
    ```env
    PORT=3000
    MONGO_URI=your-mongodb-atlas-connection-string
+   SESSION_SECRET=your-strong-session-secret
    ```
    - `MONGO_URI` should be a **MongoDB Atlas** connection string (do not commit `.env` to GitHub).
+   - `SESSION_SECRET` is used by `express-session` to sign cookies.
 
 5. Start the server:
    ```bash
@@ -57,10 +65,11 @@ The application will evolve from a simple static landing page to a full-featured
    ```
 
 7. From the home page (`/`) you can:
-   - Create a new task using the form
-   - Edit an existing task
-   - Delete a task
-   - See data loaded dynamically from the backend API and stored in MongoDB Atlas
+- Login (default admin: **admin@example.com / admin123**)
+- Create a new task using the form (auth required)
+- Edit an existing task (auth required)
+- Delete a task (auth required)
+- See data loaded dynamically from the backend API and stored in MongoDB Atlas
 
 ## Project Structure
 
@@ -154,6 +163,39 @@ project-root/
 - **POST /api/tasks** - Create a new task (called from form)
 - **PUT /api/tasks/:id** - Update an existing task
 - **DELETE /api/tasks/:id** - Delete a task
+
+### Authentication & Sessions
+- **POST /api/login** — issues session on valid credentials; uses bcrypt to verify password.
+- **POST /api/logout** — destroys session.
+- **GET /api/me** — returns current session user.
+- Session cookie: `sid`, HttpOnly; Secure when `NODE_ENV=production`; no sensitive data stored in cookie.
+- Default admin (seeded): **admin@example.com / admin123**.
+
+## Environment Variables
+
+- **LOCAL (.env, not committed to GitHub)**:
+  - `PORT` – local port for development (e.g. `3000`)
+  - `MONGO_URI` – MongoDB Atlas connection string
+  - `SESSION_SECRET` – secret for signing sessions
+
+- **PRODUCTION (Render → Settings → Environment)**:
+  - `MONGO_URI` – the same Atlas connection string (required)
+  - `PORT` – provided by Render automatically; server uses `process.env.PORT || 3000`
+  - `SESSION_SECRET` – set a strong secret value for sessions
+
+- `.env` is listed in `.gitignore` and is **never pushed** to GitHub.
+
+## Local vs Production Differences
+
+- **Local**:
+  - Server runs on `http://localhost:3000`
+  - Environment variables come from `.env`
+  - MongoDB Atlas must allow your local IP in Network Access
+
+- **Production (Render)**:
+  - Public URL: https://web2-asik-3-2.onrender.com
+  - Environment variables configured in Render dashboard (not from `.env`)
+  - MongoDB Atlas must allow Render IPs (e.g. `0.0.0.0/0` for testing)
 
 ## Form Features
 

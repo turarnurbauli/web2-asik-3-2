@@ -52,6 +52,24 @@
                 loaded dynamically through the backend API.
             </p>
 
+            <div class="auth-panel" id="authPanel">
+                <div class="auth-status" id="authStatus">Not logged in</div>
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group inline">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="admin@example.com" required>
+                    </div>
+                    <div class="form-group inline">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="admin123" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                    <button type="button" class="btn-secondary" id="logoutBtn" style="display:none;">Logout</button>
+                    <div class="auth-hint">Default: admin@example.com / admin123</div>
+                    <div class="auth-error" id="authError"></div>
+                </form>
+            </div>
+
             <div class="tasks-layout">
                 <!-- CREATE / UPDATE FORM -->
                 <div class="task-form-card">
@@ -74,6 +92,31 @@
                                 <option value="done">Done</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select id="priority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="date" id="dueDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <input type="text" id="category" placeholder="e.g. Deploy">
+                        </div>
+                        <div class="form-group">
+                            <label for="assignee">Assignee</label>
+                            <input type="text" id="assignee" placeholder="Who is responsible">
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags (comma separated)</label>
+                            <input type="text" id="tags" placeholder="deploy, ui, docs">
+                        </div>
                         <div class="task-form-actions">
                             <button type="submit" class="btn-primary" id="saveTaskBtn">Save Task</button>
                             <button type="button" class="btn-secondary" id="cancelEditBtn" style="display:none;">
@@ -81,6 +124,7 @@
                             </button>
                         </div>
                     </form>
+                    <div class="form-hint">Write operations (create/edit/delete) доступны только после логина.</div>
                 </div>
 
                 <!-- TASKS TABLE -->
@@ -93,6 +137,11 @@
                                     <th>Title</th>
                                     <th>Description</th>
                                     <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Due</th>
+                                    <th>Category</th>
+                                    <th>Assignee</th>
+                                    <th>Tags</th>
                                     <th>Created</th>
                                     <th>Actions</th>
                                 </tr>
