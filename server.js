@@ -33,6 +33,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // ====== SESSION CONFIG ======
+// Нужен trust proxy, чтобы Secure-cookie работали за прокси (Render)
+app.set('trust proxy', 1);
+
 app.use(
   session({
     name: 'sid',
