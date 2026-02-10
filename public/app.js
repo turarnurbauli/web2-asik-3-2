@@ -18,18 +18,33 @@ const cancelEditBtn = document.getElementById('cancelEditBtn');
 const loginForm = document.getElementById('loginForm');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
+const signupForm = document.getElementById('signupForm');
+const signupEmail = document.getElementById('signupEmail');
+const signupPassword = document.getElementById('signupPassword');
 const logoutBtn = document.getElementById('logoutBtn');
 const authStatus = document.getElementById('authStatus');
 const authError = document.getElementById('authError');
 
-let currentUser = null;
+const prevPageBtn = document.getElementById('prevPageBtn');
+const nextPageBtn = document.getElementById('nextPageBtn');
+const pageInfo = document.getElementById('pageInfo');
 
-async function fetchTasks() {
+let currentUser = null;
+let currentPage = 1;
+let totalPages = 1;
+
+async function fetchTasks(page = 1) {
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(`${API_URL}?page=${page}&limit=10`);
     if (!res.ok) throw new Error('Failed to load tasks');
-    const tasks = await res.json();
+    const data = await res.json();
+    const tasks = Array.isArray(data) ? data : data.tasks;
     renderTasks(tasks);
+    if (data && typeof data.total === 'number') {
+      currentPage = data.page;
+      totalPages = Math.max(1, Math.ceil(data.total / data.limit));
+      updatePaginationUI();
+    }
   } catch (err) {
     console.error(err);
     alert('Error loading tasks from server.');
@@ -152,8 +167,9 @@ taskForm.addEventListener('submit', async (e) => {
 
 async function startEditTask(id) {
   try {
-    const res = await fetch(API_URL);
-    const tasks = await res.json();
+    const res = await fetch(`${API_URL}?page=${currentPage}&limit=10`);
+    const data = await res.json();
+    const tasks = Array.isArray(data) ? data : data.tasks;
     const task = tasks.find((t) => t._id === id);
     if (!task) {
       alert('Task not found');
@@ -209,7 +225,8 @@ async function deleteTask(id) {
 // ====== AUTH HANDLERS ======
 function updateAuthUI() {
   if (currentUser) {
-    authStatus.textContent = `Logged in as ${currentUser.email}`;
+    const role = currentUser.role || 'user';
+    authStatus.textContent = `Logged in as ${currentUser.email} (${role})`;
     logoutBtn.style.display = 'inline-block';
   } else {
     authStatus.textContent = 'Not logged in';
@@ -252,7 +269,51 @@ logoutBtn.addEventListener('click', async () => {
   }
 });
 
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  authError.textContent = '';
+  try {
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: signupEmail.value.trim(),
+        password: signupPassword.value
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = data.error || (data.details && data.details[0]) || 'Signup failed';
+      throw new Error(msg);
+    }
+    currentUser = { email: data.email, role: data.role, name: data.name };
+    updateAuthUI();
+    await fetchTasks();
+  } catch (err) {
+    console.error(err);
+    authError.textContent = err.message;
+  }
+});
+
+function updatePaginationUI() {
+  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  prevPageBtn.disabled = currentPage <= 1;
+  nextPageBtn.disabled = currentPage >= totalPages;
+}
+
+prevPageBtn.addEventListener('click', () => {
+  if (currentPage > 1) {
+    fetchTasks(currentPage - 1);
+  }
+});
+
+nextPageBtn.addEventListener('click', () => {
+  if (currentPage < totalPages) {
+    fetchTasks(currentPage + 1);
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-  fetchMe().then(fetchTasks);
+  fetchMe().then(() => fetchTasks());
 });
 

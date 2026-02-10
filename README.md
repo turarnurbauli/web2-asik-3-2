@@ -85,7 +85,19 @@ project-root/
 │   ├── search.html        # Search results page
 │   ├── item.html          # Item details page
 │   └── 404.html           # 404 error page
-├── server.js              # Main Express server file (API + pages + MongoDB connection)
+├── models/
+│   ├── Task.js            # Task mongoose model (with owner, status, priority, etc.)
+│   └── User.js            # User mongoose model (email, passwordHash, role)
+├── routes/
+│   ├── auth.js            # Auth routes: login/logout/me/signup
+│   └── tasks.js           # Task routes: CRUD with ownership and pagination
+├── middleware/
+│   └── auth.js            # requireAuth, requireRole, attachUserIfExists, enforceOwnershipOrAdmin
+├── config/
+│   └── db.js              # MongoDB connection and seed logic
+├── utils/
+│   └── validation.js      # Validation helpers for tasks and users
+├── server.js              # Main Express server file (wires routes, sessions, static pages)
 ├── package.json           # Node.js dependencies and project metadata
 ├── messages.json          # JSON file storing contact form submissions (auto-created)
 └── README.md              # Project documentation
@@ -158,18 +170,23 @@ project-root/
 - **GET /api/info** - API endpoint returning project information in JSON format
   - Returns JSON object with project details, team info, routes, and technologies
 
-### Assignment 3 Part 2 API Routes (CRUD)
-- **GET /api/tasks** - Get all tasks (loaded into UI table)
-- **POST /api/tasks** - Create a new task (called from form)
-- **PUT /api/tasks/:id** - Update an existing task
-- **DELETE /api/tasks/:id** - Delete a task
+### Task API Routes (CRUD + ownership + pagination)
+- **GET /api/tasks?page=&limit=** - Get paginated tasks:
+  - For regular users: only their own tasks (by `owner`).
+  - For admin: all tasks.
+- **POST /api/tasks** - Create a new task (auth required, `owner` set from current user).
+- **PUT /api/tasks/:id** - Update existing task (auth required, only owner or admin).
+- **DELETE /api/tasks/:id** - Delete task (auth required, only owner or admin).
 
-### Authentication & Sessions
-- **POST /api/login** — issues session on valid credentials; uses bcrypt to verify password.
+### Authentication, Signup & Sessions
+- **POST /api/signup** — register a new user (role `user`, bcrypt hashing, validation).
+- **POST /api/login** — login; issues session on valid credentials, bcrypt verifies password.
 - **POST /api/logout** — destroys session.
-- **GET /api/me** — returns current session user.
+- **GET /api/me** — returns current session user (email, name, role).
 - Session cookie: `sid`, HttpOnly; Secure when `NODE_ENV=production`; no sensitive data stored in cookie.
-- Default admin (seeded): **admin@example.com / admin123**.
+- Default demo accounts:
+  - Admin: **admin@example.com / admin123**
+  - Regular user: **user@example.com / user123**
 
 ## Environment Variables
 

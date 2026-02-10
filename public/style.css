@@ -590,6 +590,12 @@ footer p {
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
+.auth-forms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
 .auth-form {
     display: flex;
     flex-wrap: wrap;
@@ -681,6 +687,18 @@ footer p {
     font-style: italic;
 }
 
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+#pageInfo {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
 .btn-small {
     padding: 0.35rem 0.75rem;
     font-size: 0.85rem;
@@ -746,6 +764,10 @@ footer p {
     .auth-form {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .auth-forms {
+        flex-direction: column;
     }
 }
 

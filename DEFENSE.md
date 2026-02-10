@@ -1,4 +1,4 @@
-# Защита Assignment 3 Part 2 — что показать и что сказать
+# Защита Final Project — что показать и что сказать
 
 Используй этот файл как шпаргалку на защите. **Postman не используй** — всё показывай через веб-интерфейс.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 2. Показать логин/сессии и полный CRUD через веб-интерфейс (4–5 мин)
+## 2. Показать логин/сессии, роли и полный CRUD через веб-интерфейс (5–6 мин)
 
 Делай по порядку, без Postman.
 
@@ -21,15 +21,21 @@
 - Скажи: *«После успешного логина сервер создаёт сессию, express-session пишет cookie `sid` (HttpOnly, Secure в продакшене). Пароли в cookie не хранятся.»*
 - Покажи статус «Logged in as ...». Если выйдешь — POST /api/logout, сессия уничтожается.
 
+### Регистрация (signup)
+- Покажи форму Sign up вверху (email + password).
+- Зарегистрируй нового пользователя (например, `student@test.com / password`).
+- Скажи: *«POST /api/signup — создаёт нового пользователя с ролью user, пароль хешируется через bcrypt.»*
+
 ### CREATE (создание)
 - Заполни форму: Title (обязательно), Description, Status, Priority, Due Date, Category, Assignee, Tags.
 - Нажми **Save Task**.
 - Скажи: *«POST /api/tasks — создаёт задачу в MongoDB; операция доступна только после логина.»*
 - Покажи, что задача появилась в таблице.
 
-### READ (чтение)
+### READ (чтение) + пагинация
 - Скажи: *«GET /api/tasks грузит данные при открытии страницы, таблица показывает все поля.»*
 - Покажи столбцы: Title, Description, Status, Priority, Due, Category, Assignee, Tags, Created.
+- Покажи контролы пагинации (Prev/Next) и скажи: *«Параметры page/limit передаются в GET /api/tasks, на сервере используется skip/limit.»*
 
 ### UPDATE (обновление)
 - Нажми **Edit**, измени пару полей, **Save Task**.
@@ -41,18 +47,18 @@
 
 ---
 
-## 3. Объяснить backend и API (2 мин)
+## 3. Объяснить backend и API (2–3 мин)
 
 Можешь открыть `server.js` в редакторе и кратко пройтись:
 
-- *«Бэкенд — Node.js и Express. Подключаем Mongoose к MongoDB через `process.env.MONGO_URI`. Сессии — express-session + connect-mongo, cookie HttpOnly (Secure в продакшене).»*
-- *«Модель задачи `Task`: title, description, status, priority, dueDate, category, assignee, tags, timestamps.»*
-- *«CRUD эндпоинты:*
-  - *`GET /api/tasks` — список (доступен без логина);*
-  - *`POST /api/tasks` — создание (только авторизованные);*
-  - *`PUT /api/tasks/:id` — обновление (только авторизованные);*
-  - *`DELETE /api/tasks/:id` — удаление (только авторизованные).»*
-- *«Auth эндпоинты: `POST /login`, `POST /logout`, `GET /me`. Пароли хешируются bcrypt; при ошибке — «Invalid credentials» без подробностей.»*
+- *«Бэкенд — Node.js и Express. Структура: `models` (Task, User), `routes` (auth, tasks), `middleware/auth`, `config/db`. Подключаемся к MongoDB через `config/db.js`.»*
+- *«Модель `User`: email, passwordHash, name, role (admin/user). Модель `Task`: owner (ссылка на User), title, description, status, priority, dueDate, category, assignee, tags, timestamps.»*
+- *«Эндпоинты задач:*
+  - *`GET /api/tasks?page&limit` — список задач текущего пользователя (или всех для admin) с пагинацией;*
+  - *`POST /api/tasks` — создание задачи, owner берётся из сессии;*
+  - *`PUT /api/tasks/:id` — обновление, доступ только owner или admin;*
+  - *`DELETE /api/tasks/:id` — удаление, доступ только owner или admin.»*
+- *«Auth эндпоинты: `POST /signup` (регистрация user), `POST /login`, `POST /logout`, `GET /me`. Пароли хешируются bcrypt; при ошибке логина — только «Invalid credentials», без деталей.»*
 - *«Корень `/` отдаёт `index.html`, `app.js` через fetch вызывает API.»*
 
 ---

@@ -54,20 +54,34 @@
 
             <div class="auth-panel" id="authPanel">
                 <div class="auth-status" id="authStatus">Not logged in</div>
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group inline">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" placeholder="admin@example.com" required>
-                    </div>
-                    <div class="form-group inline">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="admin123" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Login</button>
-                    <button type="button" class="btn-secondary" id="logoutBtn" style="display:none;">Logout</button>
-                    <div class="auth-hint">Default: admin@example.com / admin123</div>
-                    <div class="auth-error" id="authError"></div>
-                </form>
+                <div class="auth-forms">
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group inline">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" placeholder="admin@example.com" required>
+                        </div>
+                        <div class="form-group inline">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" placeholder="admin123" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Login</button>
+                        <button type="button" class="btn-secondary" id="logoutBtn" style="display:none;">Logout</button>
+                        <div class="auth-hint">Admin: admin@example.com / admin123</div>
+                    </form>
+                    <form id="signupForm" class="auth-form">
+                        <div class="form-group inline">
+                            <label for="signupEmail">Sign up email</label>
+                            <input type="email" id="signupEmail" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group inline">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" placeholder="user123">
+                        </div>
+                        <button type="submit" class="btn-secondary">Sign up</button>
+                        <div class="auth-hint">New users get role \"user\".</div>
+                    </form>
+                </div>
+                <div class="auth-error" id="authError"></div>
             </div>
 
             <div class="tasks-layout">
@@ -130,6 +144,11 @@
                 <!-- TASKS TABLE -->
                 <div class="task-table-card">
                     <h3>Task List</h3>
+                    <div class="pagination" id="paginationControls">
+                        <button class="btn-small" id="prevPageBtn">Prev</button>
+                        <span id="pageInfo"></span>
+                        <button class="btn-small" id="nextPageBtn">Next</button>
+                    </div>
                     <div class="table-wrapper">
                         <table class="task-table">
                             <thead>
