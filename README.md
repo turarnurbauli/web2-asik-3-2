@@ -185,8 +185,8 @@ project-root/
 - **GET /api/me** — returns current session user (email, name, role).
 - Session cookie: `sid`, HttpOnly; Secure when `NODE_ENV=production`; no sensitive data stored in cookie.
 - Default demo accounts:
-  - Admin: **admin@example.com / admin123**
-  - Regular user: **user@example.com / user123**
+  - Admin (role `admin`): **admin@example.com / admin123**
+  - Regular users (role `user`): **turar@example.com / turar123**, **alkhan@example.com / alkhan123**
 
 ## Environment Variables
 

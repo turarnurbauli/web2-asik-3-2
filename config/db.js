@@ -55,26 +55,27 @@ async function ensureAdminUser() {
   return user;
 }
 
-async function ensureRegularUser() {
-  const existing = await User.findOne({ email: 'user@example.com' });
+async function ensureNamedUser(email, password, name) {
+  const existing = await User.findOne({ email });
   if (existing) return existing;
-  const passwordHash = await bcrypt.hash('user123', 10);
+  const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({
-    email: 'user@example.com',
+    email,
     passwordHash,
-    name: 'Regular User',
+    name,
     role: 'user'
   });
-  console.log('Seeded regular user: user@example.com / user123');
+  console.log(`Seeded user: ${email} / ${password}`);
   return user;
 }
 
 async function connectDB(mongoUri) {
   await mongoose.connect(mongoUri, {});
   console.log('MongoDB connected');
-  const admin = await ensureAdminUser();
-  const regular = await ensureRegularUser();
-  await seedTasksIfNeeded([admin._id, regular._id]);
+  await ensureAdminUser();
+  const turar = await ensureNamedUser('turar@example.com', 'turar123', 'Turar Nurbauli');
+  const alkhan = await ensureNamedUser('alkhan@example.com', 'alkhan123', 'Alkhan Almas');
+  await seedTasksIfNeeded([turar._id, alkhan._id]);
 }
 
 module.exports = {
