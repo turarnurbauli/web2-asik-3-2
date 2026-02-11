@@ -31,6 +31,7 @@ const pageInfo = document.getElementById('pageInfo');
 const overdueInfo = document.getElementById('overdueInfo');
 const tableWrapper = document.querySelector('.table-wrapper');
 const paginationControls = document.getElementById('paginationControls');
+const taskFormCard = document.getElementById('taskFormCard');
 
 let currentUser = null;
 let currentPage = 1;
@@ -279,9 +280,11 @@ function updateAuthUI() {
     const role = currentUser.role || 'user';
     authStatus.textContent = `Logged in as ${currentUser.email} (${role})`;
     logoutBtn.style.display = 'inline-block';
+    if (taskFormCard) taskFormCard.style.display = '';
   } else {
     authStatus.textContent = 'Not logged in';
     logoutBtn.style.display = 'none';
+    if (taskFormCard) taskFormCard.style.display = 'none';
   }
 }
 
