@@ -28,6 +28,7 @@ const authError = document.getElementById('authError');
 const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
 const pageInfo = document.getElementById('pageInfo');
+const overdueInfo = document.getElementById('overdueInfo');
 
 let currentUser = null;
 let currentPage = 1;
@@ -69,19 +70,28 @@ function renderTasks(tasks) {
 
   if (!tasks.length) {
     tasksEmptyMessage.style.display = 'block';
+    if (overdueInfo) overdueInfo.textContent = '';
     return;
   }
 
   tasksEmptyMessage.style.display = 'none';
 
+  let overdueCount = 0;
+  const now = new Date();
+
   tasks.forEach((task) => {
+    const isOverdue =
+      task.dueDate &&
+      new Date(task.dueDate) < now &&
+      task.status !== 'done';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${escapeHtml(task.title)}</td>
       <td>${escapeHtml(task.description || '')}</td>
       <td>
-        <span class="status-pill status-${task.status}">
-          ${task.status}
+        <span class="status-pill status-${isOverdue ? 'overdue' : task.status}">
+          ${isOverdue ? 'overdue' : task.status}
         </span>
       </td>
       <td>${escapeHtml(task.priority || '')}</td>
@@ -96,7 +106,16 @@ function renderTasks(tasks) {
       </td>
     `;
     tasksBody.appendChild(tr);
+
+    if (isOverdue) overdueCount++;
   });
+
+  if (overdueInfo) {
+    overdueInfo.textContent =
+      overdueCount > 0
+        ? `Overdue tasks: ${overdueCount}`
+        : 'No overdue tasks 🎉';
+  }
 
   // Attach events after rendering
   document.querySelectorAll('.btn-edit').forEach((btn) => {

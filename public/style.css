@@ -703,10 +703,17 @@ footer p {
     padding: 0.35rem 0.75rem;
     font-size: 0.85rem;
     border-radius: 4px;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
     color: #fff;
+}
+
+.btn-small:disabled {
+    background-color: #ecf0f1;
+    color: #95a5a6;
+    border-color: #bdc3c7;
+    cursor: default;
 }
 
 .btn-edit {
@@ -748,6 +755,17 @@ footer p {
 .status-done {
     background-color: #e8f8f5;
     color: #27ae60;
+}
+
+.status-overdue {
+    background-color: #fdecea;
+    color: #c0392b;
+}
+
+.overdue-info {
+    font-size: 0.9rem;
+    color: #c0392b;
+    margin-bottom: 0.5rem;
 }
 
 .form-hint {
