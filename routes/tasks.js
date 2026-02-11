@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const { requireAuth, enforceOwnershipOrAdmin } = require('../middleware/auth');
 const { validateTaskPayload } = require('../utils/validation');
@@ -12,7 +13,11 @@ router.get('/', async (req, res) => {
     const limit = Math.max(1, Math.min(50, parseInt(req.query.limit, 10) || 10));
     const filter = {};
     if (req.user && req.user.role !== 'admin') {
-      filter.owner = req.user.id;
+      try {
+        filter.owner = new mongoose.Types.ObjectId(req.user.id);
+      } catch (_) {
+        filter.owner = req.user.id;
+      }
     }
     const [tasks, total] = await Promise.all([
       Task.find(filter)
@@ -59,7 +64,7 @@ router.put('/:id', requireAuth, canModifyTask, async (req, res) => {
     }
     const task = await Task.findByIdAndUpdate(
       id,
-      { ...value, owner: req.user.id },
+      value,
       {
         new: true,
         runValidators: true

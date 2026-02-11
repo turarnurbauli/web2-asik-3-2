@@ -69,13 +69,31 @@ async function ensureNamedUser(email, password, name) {
   return user;
 }
 
+/** По полю Assignee выставляем owner: Turar → turar._id, Alkhan → alkhan._id, Admin → admin._id */
+async function migrateOwnerFromAssignee(turar, alkhan, admin) {
+  const tasks = await Task.find({}).select('_id assignee').lean();
+  let updated = 0;
+  for (const task of tasks) {
+    const a = (task.assignee || '').trim().toLowerCase();
+    let ownerId;
+    if (a.includes('turar')) ownerId = turar._id;
+    else if (a.includes('alkhan')) ownerId = alkhan._id;
+    else if (a.includes('admin')) ownerId = admin._id;
+    else ownerId = turar._id; // по умолчанию
+    await Task.updateOne({ _id: task._id }, { $set: { owner: ownerId } });
+    updated++;
+  }
+  if (updated) console.log(`Migrated owner from Assignee for ${updated} tasks`);
+}
+
 async function connectDB(mongoUri) {
   await mongoose.connect(mongoUri, {});
   console.log('MongoDB connected');
-  await ensureAdminUser();
+  const admin = await ensureAdminUser();
   const turar = await ensureNamedUser('turar@example.com', 'turar123', 'Turar Nurbauli');
   const alkhan = await ensureNamedUser('alkhan@example.com', 'alkhan123', 'Alkhan Almas');
   await seedTasksIfNeeded([turar._id, alkhan._id]);
+  await migrateOwnerFromAssignee(turar, alkhan, admin);
 }
 
 module.exports = {

@@ -35,7 +35,7 @@ let totalPages = 1;
 
 async function fetchTasks(page = 1) {
   try {
-    const res = await fetch(`${API_URL}?page=${page}&limit=10`);
+    const res = await fetch(`${API_URL}?page=${page}&limit=10`, { credentials: 'include' });
     if (!res.ok) throw new Error('Failed to load tasks');
     const data = await res.json();
     const tasks = Array.isArray(data) ? data : data.tasks;
@@ -53,7 +53,7 @@ async function fetchTasks(page = 1) {
 
 async function fetchMe() {
   try {
-    const res = await fetch('/api/me');
+    const res = await fetch('/api/me', { credentials: 'include' });
     const data = await res.json();
     currentUser = data.user;
     updateAuthUI();
@@ -146,7 +146,8 @@ taskForm.addEventListener('submit', async (e) => {
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      credentials: 'include'
     });
 
     if (!res.ok) {
@@ -167,7 +168,7 @@ taskForm.addEventListener('submit', async (e) => {
 
 async function startEditTask(id) {
   try {
-    const res = await fetch(`${API_URL}?page=${currentPage}&limit=10`);
+    const res = await fetch(`${API_URL}?page=${currentPage}&limit=10`, { credentials: 'include' });
     const data = await res.json();
     const tasks = Array.isArray(data) ? data : data.tasks;
     const task = tasks.find((t) => t._id === id);
@@ -210,7 +211,7 @@ function resetForm() {
 async function deleteTask(id) {
   if (!confirm('Delete this task?')) return;
   try {
-    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', credentials: 'include' });
     if (!res.ok) {
       if (res.status === 401) throw new Error('Unauthorized: please login first');
       throw new Error('Failed to delete task');
@@ -244,7 +245,8 @@ loginForm.addEventListener('submit', async (e) => {
       body: JSON.stringify({
         email: loginEmail.value.trim(),
         password: loginPassword.value
-      })
+      }),
+      credentials: 'include'
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -261,7 +263,7 @@ loginForm.addEventListener('submit', async (e) => {
 
 logoutBtn.addEventListener('click', async () => {
   try {
-    await fetch('/api/logout', { method: 'POST' });
+    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
     currentUser = null;
     updateAuthUI();
   } catch (err) {
@@ -279,11 +281,12 @@ signupForm.addEventListener('submit', async (e) => {
       body: JSON.stringify({
         email: signupEmail.value.trim(),
         password: signupPassword.value
-      })
+      }),
+      credentials: 'include'
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const msg = data.error || (data.details && data.details[0]) || 'Signup failed';
+      const msg = data.error || (Array.isArray(data.details) && data.details[0]) || 'Signup failed';
       throw new Error(msg);
     }
     currentUser = { email: data.email, role: data.role, name: data.name };
