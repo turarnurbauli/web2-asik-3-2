@@ -710,9 +710,9 @@ footer p {
 }
 
 .btn-small:disabled {
-    background-color: #ecf0f1;
-    color: #95a5a6;
-    border-color: #bdc3c7;
+    background-color: #ffffff;
+    color: #7f8c8d;
+    border-color: #d0d7de;
     cursor: default;
 }
 
