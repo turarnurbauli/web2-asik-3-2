@@ -710,9 +710,9 @@ footer p {
 }
 
 .btn-small:disabled {
-    background-color: #ffffff;
-    color: #7f8c8d;
-    border-color: #d0d7de;
+    background-color: #e3f2ff; /* светло-синий фон */
+    color: #1d4f91;           /* тёмно-синий текст */
+    border-color: #5fa8ff;    /* синий бордер */
     cursor: default;
 }
 
