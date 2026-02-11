@@ -6,13 +6,16 @@ const { validateTaskPayload } = require('../utils/validation');
 
 const router = express.Router();
 
-// Get tasks (ownership-aware, с пагинацией)
+// Get tasks (ownership-aware, с пагинацией). Без входа — 401, задачи не отдаём.
 router.get('/', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized', message: 'Log in to view tasks' });
+  }
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.max(1, Math.min(50, parseInt(req.query.limit, 10) || 10));
     const filter = {};
-    if (req.user && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin') {
       try {
         filter.owner = new mongoose.Types.ObjectId(req.user.id);
       } catch (_) {

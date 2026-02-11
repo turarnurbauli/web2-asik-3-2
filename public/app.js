@@ -29,6 +29,8 @@ const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
 const pageInfo = document.getElementById('pageInfo');
 const overdueInfo = document.getElementById('overdueInfo');
+const tableWrapper = document.querySelector('.table-wrapper');
+const paginationControls = document.getElementById('paginationControls');
 
 let currentUser = null;
 let currentPage = 1;
@@ -37,9 +39,14 @@ let totalPages = 1;
 async function fetchTasks(page = 1) {
   try {
     const res = await fetch(`${API_URL}?page=${page}&limit=10`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to load tasks');
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+      showLoginToViewTasks();
+      return;
+    }
+    if (!res.ok) throw new Error(data.error || 'Failed to load tasks');
     const tasks = Array.isArray(data) ? data : data.tasks;
+    showTasksArea(true);
     renderTasks(tasks);
     if (data && typeof data.total === 'number') {
       currentPage = data.page;
@@ -50,6 +57,23 @@ async function fetchTasks(page = 1) {
     console.error(err);
     alert('Error loading tasks from server.');
   }
+}
+
+function showLoginToViewTasks() {
+  tasksBody.innerHTML = '';
+  if (tasksEmptyMessage) {
+    tasksEmptyMessage.textContent = 'Войдите, чтобы увидеть задачи.';
+    tasksEmptyMessage.style.display = 'block';
+  }
+  if (overdueInfo) overdueInfo.textContent = '';
+  if (tableWrapper) tableWrapper.style.display = 'none';
+  if (paginationControls) paginationControls.style.display = 'none';
+}
+
+function showTasksArea(show) {
+  if (tableWrapper) tableWrapper.style.display = show ? '' : 'none';
+  if (paginationControls) paginationControls.style.display = show ? '' : 'none';
+  if (tasksEmptyMessage && show) tasksEmptyMessage.textContent = 'No tasks yet. Use the form on the left to create your first task.';
 }
 
 async function fetchMe() {
@@ -69,12 +93,19 @@ function renderTasks(tasks) {
   tasksBody.innerHTML = '';
 
   if (!tasks.length) {
-    tasksEmptyMessage.style.display = 'block';
+    if (tasksEmptyMessage) {
+      tasksEmptyMessage.textContent = 'No tasks yet. Use the form on the left to create your first task.';
+      tasksEmptyMessage.style.display = 'block';
+    }
     if (overdueInfo) overdueInfo.textContent = '';
+    if (tableWrapper) tableWrapper.style.display = 'none';
+    if (paginationControls) paginationControls.style.display = 'none';
     return;
   }
 
   tasksEmptyMessage.style.display = 'none';
+  if (tableWrapper) tableWrapper.style.display = '';
+  if (paginationControls) paginationControls.style.display = '';
 
   let overdueCount = 0;
   const now = new Date();
